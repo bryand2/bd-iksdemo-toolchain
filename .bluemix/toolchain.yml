@@ -25,27 +25,14 @@ toolchain:
     getting_started:
       $ref: "#/messages/template.gettingStarted"
 services:
-  sample-repo:
+  repo:
       service_id: githubpublic
       parameters:
-        repo_name: "sample-{{name}}"
+        repo_name: "bd-helloworld-{{timestamp}}"
         repo_url: 'https://github.com/bryand2/bd-iksdemo-helloworld'
         type: clone
-        has_issues: true
-  repo:
-    service_id: >
-      $env.source_provider ? $env.source_provider : 'hostedgit'
-    parameters:
-      repo_name: 'bd-hello-containers-{{timestamp}}'
-      repo_url: >
-        $env.type === 'link' ? 
-          $env.app_repo : 'https://github.com/bryand2/bd-iksdemo-helloworld'
-      source_repo_url: >
-        $env.type === 'fork' || $env.type === 'clone' ? 
-          $env.app_repo : 'https://github.com/bryand2/bd-iksdemo-helloworld'
-      type: $env.type || 'clone'
-      has_issues: true
-      enable_traceability: true
+        has_issues: false
+        enable_traceability: true
   build:
     service_id: pipeline
     parameters:
