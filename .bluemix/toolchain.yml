@@ -25,6 +25,13 @@ toolchain:
     getting_started:
       $ref: "#/messages/template.gettingStarted"
 services:
+  sample-repo:
+      service_id: githubpublic
+      parameters:
+        repo_name: "sample-{{name}}"
+    repo_url: https://github.com/bryand2/bd-iksdemo-helloworld
+        type: clone
+        has_issues: true
   repo:
     service_id: >
       $env.source_provider ? $env.source_provider : 'hostedgit'
