@@ -495,19 +495,31 @@ stages:
         sleep 5
       done
 
+      echo ""
       APP_NAME=$(kubectl get pods --namespace ${CLUSTER_NAMESPACE} -o json | jq -r '[ .items[] | select(.spec.containers[]?.image=="'"${IMAGE_REPOSITORY}:${IMAGE_TAG}"'") | .metadata.labels.app] [0]')
       echo -e "APP: ${APP_NAME}"
+      echo ""
+      
       echo "DEPLOYED PODS:"
       kubectl describe pods --selector app=${APP_NAME} --namespace ${CLUSTER_NAMESPACE}
+      echo ""
+      
       if [ ! -z "${APP_NAME}" ]; then
         APP_SERVICE=$(kubectl get services --namespace ${CLUSTER_NAMESPACE} -o json | jq -r ' .items[] | select (.spec.selector.app=="'"${APP_NAME}"'") | .metadata.name ')
         echo -e "SERVICE: ${APP_SERVICE}"
+        echo ""
         echo "DEPLOYED SERVICES:"
         kubectl describe services ${APP_SERVICE} --namespace ${CLUSTER_NAMESPACE}
+        echo ""
       fi
       #echo "Application Logs"
       #kubectl logs --selector app=${APP_NAME} --namespace ${CLUSTER_NAMESPACE}  
       echo ""
+      
+      echo "DEPLOYED INGRESS:"
+      kubectl get ingress
+      echo ""
+
       if [[ ! -z "$NOT_READY" ]]; then
         echo ""
         echo "=========================================================="
@@ -520,8 +532,9 @@ stages:
       echo "DEPLOYMENT SUCCEEDED"
       if [ ! -z "${APP_SERVICE}" ]; then
         echo ""
-        IP_ADDR=$(bx cs workers ${PIPELINE_KUBERNETES_CLUSTER_NAME} | grep normal | head -n 1 | awk '{ print $2 }')
-        PORT=$( kubectl get services --namespace ${CLUSTER_NAMESPACE} | grep ${APP_SERVICE} | sed 's/.*:\([0-9]*\).*/\1/g' )
-        echo ""
-        echo -e "VIEW THE APPLICATION AT: http://${IP_ADDR}:${PORT}"
+        #IP_ADDR=$(bx cs workers ${PIPELINE_KUBERNETES_CLUSTER_NAME} | grep normal | head -n 1 | awk '{ print $2 }')
+        #PORT=$( kubectl get services --namespace ${CLUSTER_NAMESPACE} | grep ${APP_SERVICE} | sed 's/.*:\([0-9]*\).*/\1/g' )
+        #echo ""
+        #echo -e "VIEW THE APPLICATION AT: http://${IP_ADDR}:${PORT}"
+        echo -e "VIEW THE APPLICATION AT: http://${INGRESS_DOMAIN}.${INGRESS_SUBDOMAIN}"
       fi
